@@ -316,6 +316,9 @@ li {
   background-repeat: no-repeat;
   background-position: center;
 }
+.send {
+  cursor: pointer;
+}
 .container .right .write .write-link.send:before {
   display: inline-block;
   float: left;

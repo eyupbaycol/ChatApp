@@ -1,6 +1,7 @@
 app.controller("chatController", [
   "$scope",
-  ($scope) => {
+  "chatFactory",
+  ($scope, chatFactory) => {
     /**
      * angular variables
      */
@@ -9,6 +10,8 @@ app.controller("chatController", [
     $scope.activeTab = 1;
     $scope.chatClicked = false;
     $scope.chatName = "";
+    $scope.roomId = "";
+    $scope.message = "";
     /**
      * socket.io event handling
      */
@@ -21,9 +24,20 @@ app.controller("chatController", [
       $scope.roomList = rooms;
       $scope.$apply();
     });
+    $scope.newMessage = () => {
+      socket.emit("newMessage", {
+        message: $scope.message,
+        roomId: $scope.roomId,
+      });
+      $scope.message = "";
+    };
     $scope.switchRoom = (room) => {
-      $scope.chatName = room.roomName;
+      $scope.chatName = room.name;
+      $scope.roomId = room.id;
       $scope.chatClicked = true;
+      chatFactory.getMessages(room.id).then((data) => {
+        console.log(data);
+      });
     };
     $scope.newRoom = () => {
       let roomName = window.prompt("Enter room name");

@@ -7,8 +7,9 @@ const socketApi = {
 };
 
 //libs
-const Users = require("../src/lib/Users");
+const Users = require("./lib/Users");
 const Rooms = require("./lib/Rooms");
+const Messages = require("./lib/Messages");
 //socket auth middleware
 io.use(socketAuthorization);
 //redis adapter
@@ -31,6 +32,13 @@ io.on("connection", (socket) => {
     Users.remove(socket.request.user.googleId);
     Users.list((users) => {
       io.emit("onlineList", users);
+    });
+  });
+  socket.on("newMessage", (data) => {
+    Messages.upsert({
+      ...data,
+      username: socket.request.user.name,
+      surname: socket.request.user.surname,
     });
   });
   socket.on("newRoom", (roomName) => {
