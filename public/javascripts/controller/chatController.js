@@ -2,7 +2,8 @@ app.controller("chatController", [
   "$scope",
   "chatFactory",
   "userFactory",
-  ($scope, chatFactory,userFactory) => {
+  "configFactory",
+  ($scope, chatFactory,userFactory,configFactory) => {
     /**
      * initialization
      */
@@ -25,10 +26,14 @@ app.controller("chatController", [
     $scope.message = "";
     $scope.messages=[];
     $scope.user = {}
+    $scope.server = ""
     /**
      * socket.io event handling
      */
-    const socket = io.connect("http://localhost:3000");
+    configFactory.getConfig().then((data) => {
+      $scope.server = data;
+    });
+    const socket = io.connect($scope.server.socketUrl);
     socket.on("onlineList", (users) => {
       $scope.onlineList = users;
       $scope.$apply();

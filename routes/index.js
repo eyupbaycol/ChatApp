@@ -9,4 +9,8 @@ router.get("/", function (req, res, next) {
 router.get("/getUser", function (req, res, next) {
   res.json(req.user)
 });
+router.get("/getEnv",function(req,res,next){
+  const envData = require("../config/env.json")[process.env.NODE_ENV || 'development'];
+  res.json(envData)
+})
 module.exports = router;
