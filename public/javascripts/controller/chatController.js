@@ -1,7 +1,17 @@
 app.controller("chatController", [
   "$scope",
   "chatFactory",
-  ($scope, chatFactory) => {
+  "userFactory",
+  ($scope, chatFactory,userFactory) => {
+    /**
+     * initialization
+     */
+    function init(){
+      userFactory.getUser().then(user=>{
+       $scope.user = user;
+      })
+    }
+    init()
     /**
      * angular variables
      */
@@ -9,9 +19,12 @@ app.controller("chatController", [
     $scope.roomList = [];
     $scope.activeTab = 1;
     $scope.chatClicked = false;
+    $scope.loadingMessages = false;
     $scope.chatName = "";
     $scope.roomId = "";
     $scope.message = "";
+    $scope.messages=[];
+    $scope.user = {}
     /**
      * socket.io event handling
      */
@@ -25,19 +38,41 @@ app.controller("chatController", [
       $scope.$apply();
     });
     $scope.newMessage = () => {
-      socket.emit("newMessage", {
-        message: $scope.message,
-        roomId: $scope.roomId,
-      });
-      $scope.message = "";
+      if($scope.message.trim()){
+        socket.emit("newMessage", {
+          message: $scope.message,
+          roomId: $scope.roomId,
+        });
+         $scope.messages[$scope.roomId].push({
+           message : $scope.message,
+           userId : $scope.user._id,
+           name: $scope.user.username,
+           username : $scope.user.surname
+         }) 
+        $scope.message = "";
+      }
     };
+    socket.on('receiveMessage',message =>{
+      $scope.messages[message.roomId].push({
+        message : message.message,
+        userId : message.userId,
+        name: message.username,
+        username :message.surname
+      }) 
+    })
     $scope.switchRoom = (room) => {
       $scope.chatName = room.name;
       $scope.roomId = room.id;
       $scope.chatClicked = true;
-      chatFactory.getMessages(room.id).then((data) => {
-        console.log(data);
-      });
+      if(!$scope.messages.hasOwnProperty(room.id)){
+        $scope.loadingMessages = true;
+        console.log("servise bağlanıyor")
+        chatFactory.getMessages(room.id).then((data) => {
+          $scope.messages[room.id] = data ;
+          $scope.loadingMessages = false;
+        });
+      }
+      
     };
     $scope.newRoom = () => {
       let roomName = window.prompt("Enter room name");

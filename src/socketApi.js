@@ -29,17 +29,20 @@ io.on("connection", (socket) => {
     io.emit("onlineList", users);
   });
   socket.on("disconnect", () => {
-    Users.remove(socket.request.user.googleId);
+    Users.remove(socket.request.user._id);
     Users.list((users) => {
       io.emit("onlineList", users);
     });
   });
   socket.on("newMessage", (data) => {
-    Messages.upsert({
+    const messageData = {
       ...data,
+      userId:socket.request.user._id,
       username: socket.request.user.name,
       surname: socket.request.user.surname,
-    });
+    }
+    Messages.upsert(messageData);
+    socket.broadcast.emit('receiveMessage',messageData)
   });
   socket.on("newRoom", (roomName) => {
     Rooms.upsert(roomName);

@@ -1,9 +1,10 @@
 app.factory("chatFactory", [
   "$http",
-  ($http) => {
+  'env',
+  ($http,env) => {
     const getMessages = (roomId) => {
       return $http({
-        url: "http://localhost:3000/messages/list",
+        url: env.SERVICE_URL +"/messages/list",
         method: "GET",
         params: { roomId },
       }).then(

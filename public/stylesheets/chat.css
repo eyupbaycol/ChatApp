@@ -430,6 +430,11 @@ li {
   text-align: center;
   padding-top: 16px;
 }
+.loading {
+  text-align: center;
+  font-size: 16px;
+  padding:4px 0;
+}
 
 @keyframes slideFromLeft {
   0% {
@@ -471,3 +476,4 @@ li {
     opacity: 1;
   }
 }
+

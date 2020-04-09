@@ -5,7 +5,7 @@ const Messsages = require("../src/lib/Messages");
 
 router.get("/list", function (req, res, next) {
   Messsages.list(req.query.roomId, (messages) => {
-    res.json({ messages });
+    res.json(messages);
   });
 });
 
